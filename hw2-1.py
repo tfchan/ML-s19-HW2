@@ -3,6 +3,7 @@
 from argparse import ArgumentParser
 import struct
 import numpy as np
+import naive_bayes as nb
 
 
 def read_mnist(file):
@@ -14,6 +15,11 @@ def read_mnist(file):
             shape += [struct.unpack('>I', f.read(4))[0]]
         data = np.fromfile(f, dtype='uint8').reshape(tuple(shape))
     return data
+
+
+def imgs2features(imgs):
+    """Convert array of images to array of features."""
+    return imgs.reshape((imgs.shape[0], imgs.shape[1] * imgs.shape[2]))
 
 
 def main():
@@ -37,6 +43,10 @@ def main():
     train_label = read_mnist(args.train_label_path)
     test_image = read_mnist(args.test_image_path)
     test_label = read_mnist(args.test_label_path)
+
+    # Train the model
+    nbc = nb.NBClassifier(mode=args.mode)
+    nbc.fit(imgs2features(train_image), train_label)
 
 
 if __name__ == '__main__':
