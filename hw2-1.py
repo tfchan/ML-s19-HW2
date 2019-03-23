@@ -28,7 +28,8 @@ def main():
                         help='Path to testing image data')
     parser.add_argument('test_label_path', type=str,
                         help='Path to testing label data')
-    parser.add_argument('mode', type=int, help='Discrete or continuous mode')
+    parser.add_argument('mode', type=int, choices=[0, 1],
+                        help='0 or 1 (Discrete or continuous mode)')
     args = parser.parse_args()
 
     # Read mnist data
