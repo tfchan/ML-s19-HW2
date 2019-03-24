@@ -7,14 +7,15 @@ class NaiveBayes:
 
     def __init__(self):
         """Initialize member variables."""
-        self._prior = {}
+        self._class_count = {}
+        self._class_prior = {}
         self._likelihood = {}
 
     def _compute_prior(self, targets):
         """Compute prior probabilty for each class."""
         category, counts = np.unique(targets, return_counts=True)
-        counts = zip(counts, counts / counts.sum())
-        self._prior = dict(zip(category, counts))
+        self._class_count = dict(zip(category, counts))
+        self._class_prior = dict(zip(category, counts / counts.sum()))
 
 
 class DiscreteNB(NaiveBayes):
