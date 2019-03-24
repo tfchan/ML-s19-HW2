@@ -22,6 +22,20 @@ def imgs2features(imgs):
     return imgs.reshape((imgs.shape[0], imgs.shape[1] * imgs.shape[2]))
 
 
+def print_predictions(pred_results, label):
+    """Print prediction result in a readable way."""
+    error_count = 0
+    for i, pred_result in enumerate(pred_results):
+        print('Posterior (in log scale):')
+        for class_, proba in pred_result.items():
+            print(f'{class_}: {proba}')
+        pred_num = min(pred_result, key=lambda x: pred_result[x])
+        print(f'Prediction: {pred_num}, Ans:{label[i]}')
+        if pred_num != label[i]:
+            error_count += 1
+    return error_count / len(pred_results)
+
+
 def main():
     """Perform main task of the program."""
     # Parse arguments
@@ -48,6 +62,8 @@ def main():
     nbc = nb.DiscreteNB()
     nbc.fit(imgs2features(train_image), train_label)
     prediction = nbc.predict_log_proba(imgs2features(test_image))
+    error_rate = print_predictions(prediction, test_label)
+    print(error_rate)
 
 
 if __name__ == '__main__':
