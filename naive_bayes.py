@@ -10,7 +10,7 @@ class NBClassifier:
         self._mode = mode
         self._prior = {}
 
-    def compute_prior(self, targets):
+    def _compute_prior(self, targets):
         """Compute prior probabilty for each class."""
         category, counts = np.unique(targets, return_counts=True)
         counts = [(count, count / counts.sum()) for count in counts]
@@ -18,4 +18,4 @@ class NBClassifier:
 
     def fit(self, features, targets):
         """Fit the classifier with features and targets."""
-        self.compute_prior(targets)
+        self._compute_prior(targets)
