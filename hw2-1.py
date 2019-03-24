@@ -45,7 +45,7 @@ def main():
     test_label = read_mnist(args.test_label_path)
 
     # Train the model
-    nbc = nb.NBClassifier(mode=args.mode)
+    nbc = nb.DiscreteNB()
     nbc.fit(imgs2features(train_image), train_label)
 
 

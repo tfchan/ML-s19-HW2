@@ -2,12 +2,11 @@
 import numpy as np
 
 
-class NBClassifier:
-    """Naive Bayes classifier."""
+class NaiveBayes:
+    """Base class for naive Bayes classifier."""
 
-    def __init__(self, mode=0):
-        """Initialize classifier with mode."""
-        self._mode = mode
+    def __init__(self):
+        """Initialize member variables."""
         self._prior = {}
         self._likelihood = {}
 
@@ -17,7 +16,11 @@ class NBClassifier:
         counts = zip(counts, counts / counts.sum())
         self._prior = dict(zip(category, counts))
 
-    def _compute_discrete_likelihood(self, features, targets):
+
+class DiscreteNB(NaiveBayes):
+    """Naive Bayes classifier for discrete features."""
+
+    def _compute_likelihood(self, features, targets):
         """Compute likelihood for discrete values."""
         for category in self._prior.keys():
             category_features = features[targets == category]
@@ -31,5 +34,4 @@ class NBClassifier:
     def fit(self, features, targets):
         """Fit the classifier with features and targets."""
         self._compute_prior(targets)
-        if self._mode == 0:
-            self._compute_discrete_likelihood(features // 8, targets)
+        self._compute_likelihood(features // 8, targets)
