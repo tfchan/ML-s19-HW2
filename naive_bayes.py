@@ -13,7 +13,7 @@ class NBClassifier:
     def _compute_prior(self, targets):
         """Compute prior probabilty for each class."""
         category, counts = np.unique(targets, return_counts=True)
-        counts = [(count, count / counts.sum()) for count in counts]
+        counts = zip(counts, counts / counts.sum())
         self._prior = dict(zip(category, counts))
 
     def fit(self, features, targets):
