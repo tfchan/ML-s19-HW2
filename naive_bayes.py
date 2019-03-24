@@ -23,7 +23,7 @@ class DiscreteNB(NaiveBayes):
 
     def _compute_likelihood(self, features, targets):
         """Compute likelihood for discrete values."""
-        for category in self._prior.keys():
+        for category in self._class_prior.keys():
             category_features = features[targets == category]
             values_freq = []
             for col_num in range(features.shape[1]):
@@ -39,3 +39,23 @@ class DiscreteNB(NaiveBayes):
         """Fit the classifier with features and targets."""
         self._compute_prior(targets)
         self._compute_likelihood(self._preprocess_features(features), targets)
+
+    def predict_log_proba(self, features):
+        """Give log probability for each class of each sample."""
+        new_features = self._preprocess_features(features)
+        sample_posteriors = []
+        for sample in new_features:
+            class_posterior = {}
+            # Calculate P(x|c) * P(c) in log scale
+            for class_ in self._class_prior.keys():
+                likelihoods = np.array([self._class_likelihood[class_][i].get(
+                    sample[i], np.nan) for i in range(sample.shape[0])])
+                likelihoods[np.isnan(likelihoods)] = np.nanmin(likelihoods)
+                class_posterior[class_] = -np.sum(np.log(likelihoods))
+                class_posterior[class_] -= self._class_prior[class_]
+            # Normalise to sum up to 1
+            for class_ in self._class_prior.keys():
+                class_posterior[class_] /= sum(class_posterior.values())
+            sample_posteriors += [class_posterior]
+            print(class_posterior)
+        return sample_posteriors
