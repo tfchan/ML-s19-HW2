@@ -47,6 +47,7 @@ def main():
     # Train the model
     nbc = nb.DiscreteNB()
     nbc.fit(imgs2features(train_image), train_label)
+    prediction = nbc.predict_log_proba(imgs2features(test_image))
 
 
 if __name__ == '__main__':

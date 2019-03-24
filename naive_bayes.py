@@ -52,10 +52,10 @@ class DiscreteNB(NaiveBayes):
                     sample[i], np.nan) for i in range(sample.shape[0])])
                 likelihoods[np.isnan(likelihoods)] = np.nanmin(likelihoods)
                 class_posterior[class_] = -np.sum(np.log(likelihoods))
-                class_posterior[class_] -= self._class_prior[class_]
+                class_posterior[class_] -= np.log(self._class_prior[class_])
             # Normalise to sum up to 1
+            total = sum(class_posterior.values())
             for class_ in self._class_prior.keys():
-                class_posterior[class_] /= sum(class_posterior.values())
+                class_posterior[class_] /= total
             sample_posteriors += [class_posterior]
-            print(class_posterior)
         return sample_posteriors
