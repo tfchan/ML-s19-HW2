@@ -9,7 +9,7 @@ class NaiveBayes:
         """Initialize member variables."""
         self._class_count = {}
         self._class_prior = {}
-        self._likelihood = {}
+        self._class_likelihood = {}
 
     def _compute_prior(self, targets):
         """Compute prior probabilty for each class."""
@@ -30,7 +30,7 @@ class DiscreteNB(NaiveBayes):
                 value, counts = np.unique(category_features[:, col_num],
                                           return_counts=True)
                 values_freq += [dict(zip(value, counts / counts.sum()))]
-            self._likelihood[category] = values_freq
+            self._class_likelihood[category] = values_freq
 
     def fit(self, features, targets):
         """Fit the classifier with features and targets."""
