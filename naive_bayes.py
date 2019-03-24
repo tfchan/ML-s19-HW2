@@ -32,7 +32,10 @@ class DiscreteNB(NaiveBayes):
                 values_freq += [dict(zip(value, counts / counts.sum()))]
             self._class_likelihood[category] = values_freq
 
+    def _preprocess_features(self, features):
+        return features // 8
+
     def fit(self, features, targets):
         """Fit the classifier with features and targets."""
         self._compute_prior(targets)
-        self._compute_likelihood(features // 8, targets)
+        self._compute_likelihood(self._preprocess_features(features), targets)
