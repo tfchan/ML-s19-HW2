@@ -2,9 +2,6 @@
 import numpy as np
 
 
-_bin_len = 8
-
-
 class NaiveBayes:
     """Base class for naive Bayes classifier."""
 
@@ -30,16 +27,22 @@ class NaiveBayes:
 class DiscreteNB(NaiveBayes):
     """Naive Bayes classifier for discrete features."""
 
+    _bin_len = 8
+    _n_bin = 256 // _bin_len
+
     def _compute_likelihood(self, features, targets):
         """Compute likelihood for discrete values."""
-        for category in self._class_prior.keys():
-            category_features = features[targets == category]
-            values_freq = []
-            for col_num in range(features.shape[1]):
-                value, counts = np.unique(category_features[:, col_num],
-                                          return_counts=True)
-                values_freq += [dict(zip(value, counts / counts.sum()))]
-            self._class_likelihood[category] = values_freq
+        features = features // self._bin_len
+        n_class = self._classes.shape[0]
+        n_feature = features.shape[1]
+        self._class_likelihood = np.zeros((n_class, n_feature, self._n_bin))
+        for c in range(n_class):
+            class_features = features[targets == self._classes[c]]
+            for i in range(n_feature):
+                bin_freq_i = np.bincount(class_features[:, i],
+                                         minlength=self._n_bin)
+                bin_proba_i = bin_freq_i / bin_freq_i.sum()
+                self._class_likelihood[c][i] = bin_proba_i
 
     def _preprocess_features(self, features):
         return features // _bin_len
