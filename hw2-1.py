@@ -30,10 +30,21 @@ def print_predictions(pred_results, label):
         for class_, proba in pred_result.items():
             print(f'{class_}: {proba}')
         pred_num = min(pred_result, key=lambda x: pred_result[x])
-        print(f'Prediction: {pred_num}, Ans:{label[i]}')
+        print(f'Prediction: {pred_num}, Ans:{label[i]}\n')
         if pred_num != label[i]:
             error_count += 1
     return error_count / len(pred_results)
+
+
+def print_imaginations(imaginations):
+    """Print imaginations for each class."""
+    img_size = (28, 28)
+    for class_, feature in imaginations.items():
+        img = np.array(feature).reshape(img_size)
+        print(f'{class_}:')
+        for row in range(img.shape[0]):
+            print(*img[row], sep=' ')
+        print()
 
 
 def main():
@@ -61,9 +72,15 @@ def main():
     # Train the model
     nbc = nb.DiscreteNB()
     nbc.fit(imgs2features(train_image), train_label)
+
+    # Predict testing data
     prediction = nbc.predict_log_proba(imgs2features(test_image))
     error_rate = print_predictions(prediction, test_label)
-    print(error_rate)
+
+    # Print imaginary
+    imaginations = nbc.get_imagination()
+    print_imaginations(imaginations)
+    print(f'Error rate:{error_rate}')
 
 
 if __name__ == '__main__':

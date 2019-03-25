@@ -2,6 +2,9 @@
 import numpy as np
 
 
+_bin_len = 8
+
+
 class NaiveBayes:
     """Base class for naive Bayes classifier."""
 
@@ -33,7 +36,7 @@ class DiscreteNB(NaiveBayes):
             self._class_likelihood[category] = values_freq
 
     def _preprocess_features(self, features):
-        return features // 8
+        return features // _bin_len
 
     def fit(self, features, targets):
         """Fit the classifier with features and targets."""
@@ -59,3 +62,20 @@ class DiscreteNB(NaiveBayes):
                 class_posterior[class_] /= total
             sample_posteriors += [class_posterior]
         return sample_posteriors
+
+    def get_imagination(self):
+        """Return imaginary features of each class."""
+        split_point = 256 // 2
+        class_imagination = {}
+        for class_ in self._class_prior.keys():
+            img_features = []
+            for feature in range(len(self._class_likelihood[class_])):
+                class_feature_likeli = self._class_likelihood[class_][feature]
+                white_proba = [class_feature_likeli.get(
+                    i // _bin_len, 0) for i in range(split_point)]
+                black_proba = [class_feature_likeli.get(
+                    (i + split_point) // _bin_len, 0) for i in range(split_point)]
+                is_black = 1 if sum(black_proba) >= sum(white_proba) else 0
+                img_features += [is_black]
+            class_imagination[class_] = img_features
+        return class_imagination
