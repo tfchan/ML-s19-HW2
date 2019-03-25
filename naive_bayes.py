@@ -23,6 +23,13 @@ class NaiveBayes:
         self._compute_prior(targets)
         self._compute_likelihood(features, targets)
 
+    def predict_log_proba(self, features):
+        """Give log probability for each class of each sample."""
+        jlp = self._joint_log_proba(features)
+        for i in range(jlp.shape[0]):
+            jlp[i] = jlp[i] / jlp[i].sum()
+        return jlp
+
 
 class DiscreteNB(NaiveBayes):
     """Naive Bayes classifier for discrete features."""
@@ -42,27 +49,26 @@ class DiscreteNB(NaiveBayes):
                 bin_freq_i = np.bincount(class_features[:, i],
                                          minlength=self._n_bin)
                 bin_proba_i = bin_freq_i / bin_freq_i.sum()
+                bin_proba_i[bin_proba_i == 0] = np.nan
                 self._class_likelihood[c][i] = bin_proba_i
 
-    def predict_log_proba(self, features):
-        """Give log probability for each class of each sample."""
-        new_features = self._preprocess_features(features)
-        sample_posteriors = []
-        for sample in new_features:
-            class_posterior = {}
-            # Calculate P(x|c) * P(c) in log scale
-            for class_ in self._class_prior.keys():
-                likelihoods = np.array([self._class_likelihood[class_][i].get(
-                    sample[i], np.nan) for i in range(sample.shape[0])])
-                likelihoods[np.isnan(likelihoods)] = np.nanmin(likelihoods)
-                class_posterior[class_] = -np.sum(np.log(likelihoods))
-                class_posterior[class_] -= np.log(self._class_prior[class_])
-            # Normalise to sum up to 1
-            total = sum(class_posterior.values())
-            for class_ in self._class_prior.keys():
-                class_posterior[class_] /= total
-            sample_posteriors += [class_posterior]
-        return sample_posteriors
+    def _joint_log_proba(self, features):
+        """Compute log(P(c)P(x|c)) for each sample."""
+        features = features // self._bin_len
+        n_class = self._classes.shape[0]
+        n_sample = features.shape[0]
+        n_feature = features.shape[1]
+        pc = np.log(self._class_prior)
+        probas = np.zeros((n_sample, n_class))
+        for i in range(n_sample):
+            pxc = np.zeros(n_class)
+            for c in range(n_class):
+                pxc_c = np.array([self._class_likelihood[c, f, features[i][f]]
+                                  for f in range(n_feature)])
+                pxc_c[np.isnan(pxc_c)] = np.nanmin(pxc_c)
+                pxc[c] = np.sum(np.log(pxc_c))
+            probas[i] = pc + pxc
+        return probas
 
     def get_imagination(self):
         """Return imaginary features of each class."""
