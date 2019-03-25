@@ -44,9 +44,6 @@ class DiscreteNB(NaiveBayes):
                 bin_proba_i = bin_freq_i / bin_freq_i.sum()
                 self._class_likelihood[c][i] = bin_proba_i
 
-    def _preprocess_features(self, features):
-        return features // _bin_len
-
     def predict_log_proba(self, features):
         """Give log probability for each class of each sample."""
         new_features = self._preprocess_features(features)
