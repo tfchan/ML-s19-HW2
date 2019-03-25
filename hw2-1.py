@@ -40,22 +40,22 @@ def print_predictions(pred_results, label):
 def show_imaginations(imaginations, show):
     """Show imaginations for each class."""
     img_size = (28, 28)
-    subplot_count = 0
     if show:
         plt.figure()
-    for class_, feature in imaginations.items():
-        img = np.array(feature).reshape(img_size)
-        if show:
+        subplot_count = 0
+        for class_, feature in imaginations.items():
+            img = np.array(feature).reshape(img_size)
             ax = plt.subplot(2, 5, subplot_count + 1)
             ax.imshow(img, cmap='gray')
             subplot_count += 1
-        else:
+        plt.show()
+    else:
+        for class_, feature in imaginations.items():
+            img = np.array(feature).reshape(img_size)
             print(f'{class_}:')
             for row in range(img.shape[0]):
                 print(*img[row], sep=' ')
             print()
-    if show:
-        plt.show()
 
 
 def main():
