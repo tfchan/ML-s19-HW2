@@ -3,6 +3,7 @@
 from argparse import ArgumentParser
 import struct
 import numpy as np
+import matplotlib.pyplot as plt
 import naive_bayes as nb
 
 
@@ -36,15 +37,25 @@ def print_predictions(pred_results, label):
     return error_count / len(pred_results)
 
 
-def print_imaginations(imaginations):
-    """Print imaginations for each class."""
+def show_imaginations(imaginations, show):
+    """Show imaginations for each class."""
     img_size = (28, 28)
+    subplot_count = 0
+    if show:
+        plt.figure()
     for class_, feature in imaginations.items():
         img = np.array(feature).reshape(img_size)
-        print(f'{class_}:')
-        for row in range(img.shape[0]):
-            print(*img[row], sep=' ')
-        print()
+        if show:
+            ax = plt.subplot(2, 5, subplot_count + 1)
+            ax.imshow(img, cmap='gray')
+            subplot_count += 1
+        else:
+            print(f'{class_}:')
+            for row in range(img.shape[0]):
+                print(*img[row], sep=' ')
+            print()
+    if show:
+        plt.show()
 
 
 def main():
@@ -61,6 +72,8 @@ def main():
                         help='Path to testing label data')
     parser.add_argument('mode', type=int, choices=[0, 1],
                         help='0 or 1 (Discrete or continuous mode)')
+    parser.add_argument('-s', '--show', action='store_true',
+                        help='Show imaginary images or not')
     args = parser.parse_args()
 
     # Read mnist data
@@ -77,9 +90,10 @@ def main():
     prediction = nbc.predict_log_proba(imgs2features(test_image))
     error_rate = print_predictions(prediction, test_label)
 
-    # Print imaginary
+    # Show imaginary
     imaginations = nbc.get_imagination()
-    print_imaginations(imaginations)
+    show_imaginations(imaginations, args.show)
+
     print(f'Error rate:{error_rate}')
 
 
