@@ -79,3 +79,15 @@ class DiscreteNB(NaiveBayes):
                 img_features += [is_black]
             class_imagination[class_] = img_features
         return class_imagination
+
+
+class GussianNB(NaiveBayes):
+    """Gussian naive Bayes classifier."""
+
+    def _compute_likelihood(self, features, targets):
+        """Compute likelihood using Gussian."""
+
+    def fit(self, features, targets):
+        """Fit the classifier with features and targets."""
+        self._compute_prior(targets)
+        self._compute_likelihood(features, targets)
