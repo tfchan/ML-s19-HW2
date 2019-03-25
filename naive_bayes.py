@@ -10,15 +10,21 @@ class NaiveBayes:
 
     def __init__(self):
         """Initialize member variables."""
-        self._class_count = {}
-        self._class_prior = {}
-        self._class_likelihood = {}
+        self._classes = None
+        self._class_count = None
+        self._class_prior = None
+        self._class_likelihood = None
 
     def _compute_prior(self, targets):
         """Compute prior probabilty for each class."""
-        category, counts = np.unique(targets, return_counts=True)
-        self._class_count = dict(zip(category, counts))
-        self._class_prior = dict(zip(category, counts / counts.sum()))
+        self._classes, self._class_count = np.unique(
+            targets, return_counts=True)
+        self._class_prior = self._class_count / self._class_count.sum()
+
+    def fit(self, features, targets):
+        """Fit the classifier with features and targets."""
+        self._compute_prior(targets)
+        self._compute_likelihood(features, targets)
 
 
 class DiscreteNB(NaiveBayes):
@@ -37,11 +43,6 @@ class DiscreteNB(NaiveBayes):
 
     def _preprocess_features(self, features):
         return features // _bin_len
-
-    def fit(self, features, targets):
-        """Fit the classifier with features and targets."""
-        self._compute_prior(targets)
-        self._compute_likelihood(self._preprocess_features(features), targets)
 
     def predict_log_proba(self, features):
         """Give log probability for each class of each sample."""
