@@ -94,11 +94,11 @@ class DiscreteNB(NaiveBayes):
         return class_imaginations
 
 
-class GussianNB(NaiveBayes):
-    """Gussian naive Bayes classifier."""
+class GaussianNB(NaiveBayes):
+    """Gaussian naive Bayes classifier."""
 
     def _compute_likelihood(self, features, targets):
-        """Compute likelihood using Gussian."""
+        """Compute likelihood using Gaussian."""
         n_class = self._classes.shape[0]
         n_feature = features.shape[1]
         self._class_likelihood = np.zeros((n_class, n_feature, 2))
