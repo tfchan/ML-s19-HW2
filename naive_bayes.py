@@ -124,3 +124,23 @@ class GaussianNB(NaiveBayes):
                 pxc[c] = np.sum(pxc_c)
             probas[i] = pc + pxc
         return probas
+
+    def _imaginary_features(self):
+        """Compute imaginary features for each class."""
+        split_point = 256 // 2
+        n_class = self._classes.shape[0]
+        n_feature = self._class_likelihood.shape[1]
+        class_imaginations = np.zeros((n_class, n_feature), dtype=int)
+        for c in range(n_class):
+            for f in range(n_feature):
+                mean_cf = self._class_likelihood[c, f, 0]
+                var_cf = self._class_likelihood[c, f, 1]
+                pxc_cf = np.array([(-0.5 * np.log(2 * np.pi * var_cf)
+                                   - 0.5 * (i - mean_cf) ** 2 / var_cf)
+                                  for i in range(256)])
+                pxc_cf[np.isnan(pxc_cf)] = np.nanmin(pxc_cf)
+                white_proba = pxc_cf[:split_point]
+                black_proba = pxc_cf[split_point:]
+                is_black = np.nansum(black_proba) > np.nansum(white_proba)
+                class_imaginations[c, f] = int(is_black)
+        return class_imaginations
