@@ -118,10 +118,9 @@ class GaussianNB(NaiveBayes):
             for c in range(n_class):
                 mean_c = self._class_likelihood[c, :, 0]
                 var_c = self._class_likelihood[c, :, 1]
-                var_c[var_c == 0] = np.nan
-                var_c[np.isnan(var_c)] = np.nanmin(var_c)
-                pxc_c = -0.5 * np.sum(np.log(2 * np.pi * var_c))
-                pxc_c -= 0.5 * np.sum((features[i] - mean_c) ** 2 / var_c)
-                pxc[c] = pxc_c
+                pxc_c = (-0.5 * np.log(2 * np.pi * var_c)
+                         - 0.5 * (features[i] - mean_c) ** 2 / var_c)
+                pxc_c[np.isnan(pxc_c)] = np.nanmin(pxc_c)
+                pxc[c] = np.sum(pxc_c)
             probas[i] = pc + pxc
         return probas
