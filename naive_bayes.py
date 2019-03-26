@@ -99,3 +99,10 @@ class GussianNB(NaiveBayes):
 
     def _compute_likelihood(self, features, targets):
         """Compute likelihood using Gussian."""
+        n_class = self._classes.shape[0]
+        n_feature = features.shape[1]
+        self._class_likelihood = np.zeros((n_class, n_feature, 2))
+        for c in range(n_class):
+            class_features = features[targets == self._classes[c]]
+            self._class_likelihood[c, :, 0] = class_features.mean(axis=0)
+            self._class_likelihood[c, :, 1] = class_features.var(axis=0)
