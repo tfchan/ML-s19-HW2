@@ -26,9 +26,11 @@ class NaiveBayes:
     def predict_log_proba(self, features):
         """Give log probability for each class of each sample."""
         jlp = self._joint_log_proba(features)
+        result = []
         for i in range(jlp.shape[0]):
             jlp[i] = jlp[i] / jlp[i].sum()
-        return jlp
+            result += [dict(zip(self._classes, jlp[i]))]
+        return result
 
 
 class DiscreteNB(NaiveBayes):
