@@ -106,3 +106,22 @@ class GussianNB(NaiveBayes):
             class_features = features[targets == self._classes[c]]
             self._class_likelihood[c, :, 0] = class_features.mean(axis=0)
             self._class_likelihood[c, :, 1] = class_features.var(axis=0)
+
+    def _joint_log_proba(self, features):
+        """Compute log(P(c)P(x|c)) for each sample."""
+        n_class = self._classes.shape[0]
+        n_sample = features.shape[0]
+        pc = np.log(self._class_prior)
+        probas = np.zeros((n_sample, n_class))
+        for i in range(n_sample):
+            pxc = np.zeros(n_class)
+            for c in range(n_class):
+                mean_c = self._class_likelihood[c, :, 0]
+                var_c = self._class_likelihood[c, :, 1]
+                var_c[var_c == 0] = np.nan
+                var_c[np.isnan(var_c)] = np.nanmin(var_c)
+                pxc_c = -0.5 * np.sum(np.log(2 * np.pi * var_c))
+                pxc_c -= 0.5 * np.sum((features[i] - mean_c) ** 2 / var_c)
+                pxc[c] = pxc_c
+            probas[i] = pc + pxc
+        return probas
