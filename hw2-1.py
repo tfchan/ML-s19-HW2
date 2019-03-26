@@ -83,7 +83,7 @@ def main():
     test_label = read_mnist(args.test_label_path)
 
     # Train the model
-    nbc = nb.DiscreteNB()
+    nbc = nb.GussianNB() if args.mode else nb.DiscreteNB()
     nbc.fit(imgs2features(train_image), train_label)
 
     # Predict testing data

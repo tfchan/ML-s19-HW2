@@ -57,7 +57,7 @@ class DiscreteNB(NaiveBayes):
                                          minlength=self._n_bin)
                 bin_proba_i = bin_freq_i / bin_freq_i.sum()
                 bin_proba_i[bin_proba_i == 0] = np.nan
-                self._class_likelihood[c][i] = bin_proba_i
+                self._class_likelihood[c, i] = bin_proba_i
 
     def _joint_log_proba(self, features):
         """Compute log(P(c)P(x|c)) for each sample."""
@@ -70,7 +70,7 @@ class DiscreteNB(NaiveBayes):
         for i in range(n_sample):
             pxc = np.zeros(n_class)
             for c in range(n_class):
-                pxc_c = np.array([self._class_likelihood[c, f, features[i][f]]
+                pxc_c = np.array([self._class_likelihood[c, f, features[i, f]]
                                   for f in range(n_feature)])
                 pxc_c[np.isnan(pxc_c)] = np.nanmin(pxc_c)
                 pxc[c] = np.sum(np.log(pxc_c))
