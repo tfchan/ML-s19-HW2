@@ -99,8 +99,3 @@ class GussianNB(NaiveBayes):
 
     def _compute_likelihood(self, features, targets):
         """Compute likelihood using Gussian."""
-
-    def fit(self, features, targets):
-        """Fit the classifier with features and targets."""
-        self._compute_prior(targets)
-        self._compute_likelihood(features, targets)
