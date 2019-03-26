@@ -91,7 +91,7 @@ def main():
     error_rate = print_predictions(prediction, test_label)
 
     # Show imaginary
-    imaginations = nbc.get_imagination()
+    imaginations = nbc.get_imaginations()
     show_imaginations(imaginations, args.show)
 
     print(f'Error rate:{error_rate}')

@@ -24,13 +24,18 @@ class NaiveBayes:
         self._compute_likelihood(features, targets)
 
     def predict_log_proba(self, features):
-        """Give log probability for each class of each sample."""
+        """Give normalise log probability for each class of each sample."""
         jlp = self._joint_log_proba(features)
         result = []
         for i in range(jlp.shape[0]):
             jlp[i] = jlp[i] / jlp[i].sum()
             result += [dict(zip(self._classes, jlp[i]))]
         return result
+
+    def get_imaginations(self):
+        """Get imaginary features for each class."""
+        ifs = self._imaginary_features()
+        return dict(zip(self._classes, ifs))
 
 
 class DiscreteNB(NaiveBayes):
@@ -72,22 +77,21 @@ class DiscreteNB(NaiveBayes):
             probas[i] = pc + pxc
         return probas
 
-    def get_imagination(self):
-        """Return imaginary features of each class."""
-        split_point = 256 // 2
-        class_imagination = {}
-        for class_ in self._class_prior.keys():
-            img_features = []
-            for feature in range(len(self._class_likelihood[class_])):
-                class_feature_likeli = self._class_likelihood[class_][feature]
-                white_proba = [class_feature_likeli.get(
-                    i // _bin_len, 0) for i in range(split_point)]
-                black_proba = [class_feature_likeli.get(
-                    (i + split_point) // _bin_len, 0) for i in range(split_point)]
-                is_black = 1 if sum(black_proba) >= sum(white_proba) else 0
-                img_features += [is_black]
-            class_imagination[class_] = img_features
-        return class_imagination
+    def _imaginary_features(self):
+        """Compute imaginary features for each class."""
+        split_point = self._n_bin // 2 * self._bin_len
+        n_class = self._classes.shape[0]
+        n_feature = self._class_likelihood.shape[1]
+        class_imaginations = np.zeros((n_class, n_feature), dtype=int)
+        for c in range(n_class):
+            for f in range(n_feature):
+                white_range = np.arange(split_point) // self._bin_len
+                black_range = white_range + self._n_bin // 2
+                white_proba = self._class_likelihood[c, f, white_range]
+                black_proba = self._class_likelihood[c, f, black_range]
+                is_black = np.nansum(black_proba) >= np.nansum(white_proba)
+                class_imaginations[c, f] = int(is_black)
+        return class_imaginations
 
 
 class GussianNB(NaiveBayes):
