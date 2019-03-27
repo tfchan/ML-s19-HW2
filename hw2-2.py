@@ -4,11 +4,10 @@ from argparse import ArgumentParser
 
 
 def read_file(file_path):
-    """Read a given file and return list containing list of char."""
+    """Read a given file and all lines."""
     with open(file_path, 'r') as f:
         lines = f.readlines()
-        data = [list(line.strip()) for line in lines]
-    return data
+    return lines
 
 
 def main():
