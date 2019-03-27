@@ -7,6 +7,7 @@ def read_file(file_path):
     """Read a given file and all lines."""
     with open(file_path, 'r') as f:
         lines = f.readlines()
+        lines = [line.strip() for line in lines]
     return lines
 
 
