@@ -138,7 +138,7 @@ class GaussianNB(NaiveBayes):
                 pxc_cf = np.array([(-0.5 * np.log(2 * np.pi * var_cf)
                                    - 0.5 * (i - mean_cf) ** 2 / var_cf)
                                   for i in range(256)])
-                pxc_cf[np.isnan(pxc_cf)] = np.nanmin(pxc_cf)
+                pxc_cf[np.isnan(pxc_cf)] = np.nanmax(pxc_cf)
                 white_proba = pxc_cf[:split_point]
                 black_proba = pxc_cf[split_point:]
                 is_black = np.nansum(black_proba) > np.nansum(white_proba)
